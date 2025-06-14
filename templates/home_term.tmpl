@@ -1,0 +1,9 @@
+Logged in as user {{ .User }}
+
+Your files are:
+{{ range .Files }}
+    Filename: {{ .Filename }}
+    FileID: {{ .ID }}
+    URL: {{ .URL }}
+    Size: {{ .Size}}
+{{ end }}

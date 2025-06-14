@@ -1,0 +1,15 @@
+{
+  "name": "go-transfer",
+  "version": "1.0.0",
+  "description": "Go application with Alpine.js and Tailwind CSS",
+  "scripts": {
+    "build-css": "tailwindcss -i ./src/input.css -o ./static/css/styles.css --minify",
+    "watch-css": "tailwindcss -i ./src/input.css -o ./static/css/styles.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  },
+  "dependencies": {
+    "alpinejs": "^3.13.0"
+  }
+}
