@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 ">
     <div x-data="fileManager()" class="min-h-screen">
+
         <!-- Header -->
         <header class="bg-white dark:bg-slate-800/90 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-700/60">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,6 +46,7 @@
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
             <!-- Welcome Section -->
             <div class="mb-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm rounded-xl border border-slate-200/60 dark:border-slate-700/60 p-6">
                 <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 tracking-tight">Storage Overview</h2>
@@ -89,6 +91,7 @@
                                         <div class="text-sm" x-text="getTimeLeft(file.expiresAt)" x-bind:class="getTimeLeftClass(file.expiresAt)"></div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+
                                         <!-- Desktop buttons (hidden on mobile) -->
                                         <div class="hidden md:flex justify-end space-x-2">
                                             <button @click="downloadFile(file)" class="px-3 py-1.5 bg-emerald-600 border-2 border-emerald-600 text-white hover:bg-white hover:text-emerald-600 rounded-md text-xs font-bold transition-all duration-100">
@@ -131,8 +134,10 @@
                                                  x-transition:leave-end="opacity-0 scale-95"
                                                  class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-10">
                                                 <div class="py-1">
+
                                                     <!-- File info for mobile (shown only when menu is open) -->
                                                     <div class="px-4 py-2 border-b border-slate-200 dark:border-slate-700 sm:hidden text-center">
+
                                                     <!--
                                                         <div class="text-xs text-slate-500 dark:text-slate-400">ID: <span class="font-mono" x-text="file.id"></span></div>
                                                         -->
@@ -245,7 +250,7 @@
                         <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100 tracking-tight">Confirm Deletion</h3>
                     </div>
                     <div class="px-6 py-4">
-                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                             Are you certain you wish to permanently delete "<span x-text="fileToDelete?.name" class="font-medium text-slate-900 dark:text-slate-100"></span>"? This action is irreversible.
                         </p>
                     </div>

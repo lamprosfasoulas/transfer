@@ -28,14 +28,14 @@ func LoadTemplates() {
 	if err != nil {
 		log.Fatalf("Failed to parse template: %v", err)
 	}
-	UploadTmpl, err = template.ParseFiles("templates/upload.tmpl")
-	if err != nil {
-		log.Fatalf("Failed to parse template: %v", err)
-	}
-	ResultTmpl, err = template.ParseFiles("templates/result.tmpl")
-	if err != nil {
-		log.Fatalf("Failed to parse template: %v", err)
-	}
+	//UploadTmpl, err = template.ParseFiles("templates/upload.tmpl")
+	//if err != nil {
+	//	log.Fatalf("Failed to parse template: %v", err)
+	//}
+	//ResultTmpl, err = template.ParseFiles("templates/result.tmpl")
+	//if err != nil {
+	//	log.Fatalf("Failed to parse template: %v", err)
+	//}
 	//Terminal Response Templates
 	HomeTmplTerm, err = textplate.ParseFiles("templates/home_term.tmpl")
 	if err != nil {
