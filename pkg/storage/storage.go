@@ -40,7 +40,7 @@ func bites(bytes int64) string {
 type Storage interface {
 	PutObject		(context.Context, string, *ProgressReader) *FileInfo
 	GetObject		(context.Context, string) *FileInfo
-	ListObjects		(context.Context, string) *[]FileInfo
+	//ListObjects		(context.Context, string) *[]FileInfo
 	DeleteObject 	(context.Context, string) *FileInfo
 	GetError 		() error
 }
@@ -54,15 +54,17 @@ type ProgressReader struct {
 	Red 		int64
 	Filename	string
 	UploadID	string
+	Dispatch sse.Dispatcher
 }
 
 // NewProgressReader creates a new progress reader for each upload
-func NewProgressReader (src io.Reader, total int64, file, upId string) *ProgressReader{
+func NewProgressReader (src io.Reader, total int64, file, upId string, d sse.Dispatcher) *ProgressReader{
 	return &ProgressReader{
 			Src: src,
 			Total: total,
 			Filename: file,
 			UploadID: upId,
+			Dispatch: d,
 	}
 }
 
@@ -83,7 +85,7 @@ func (pr *ProgressReader) Read(p []byte) (n int, err error) {
 			pr.Total,
 			pct,
 			)
-		sse.SendEventToSubscriber(pr.UploadID, ev)
+		pr.Dispatch.SendEvent(context.Background(), pr.UploadID, ev)
     }
     return n, err
 }

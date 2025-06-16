@@ -3,3 +3,8 @@
 @tailwind utilities;
 
 /* Add your custom styles here */
+[x-cloak] { 
+    visibility: hidden;
+    overflow: hidden;
+    display: none;
+}

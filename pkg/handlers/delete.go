@@ -49,7 +49,8 @@ func HandleDelete(w http.ResponseWriter, r *http.Request) {
 		log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
 		log.Printf("Error deleting object: %v", info.Message)
 		http.Error(w, info.Message, http.StatusBadRequest)
-		return
+		// We still delete from db
+		//return
 	}
 
 	err := start.Database.DeleteFile(ctx, objectKey)
@@ -69,6 +70,6 @@ func HandleDelete(w http.ResponseWriter, r *http.Request) {
 
 
 	log.SetPrefix(fmt.Sprintf("[\033[34mDELETE INFO\033[0m] "))
-	log.Printf("File %s deleted successfully:",objectKey)
+	log.Printf("File %s deleted successfully\n",objectKey)
 	http.Redirect(w, r, "/", http.StatusFound)
 }

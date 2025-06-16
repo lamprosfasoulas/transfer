@@ -3,14 +3,14 @@ package database
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // Postgres implements Database and is considered a
 // provider. It implements all the interface methods
 // which actually just return the *Queries methods.
 type Postgres struct {
-	Conn 	*pgx.Conn
+	Pool 	*pgxpool.Pool
 	Repo 	*Queries
 	Error 	error
 }
@@ -18,15 +18,15 @@ type Postgres struct {
 // NewPostgres starts the connection with the database.
 // It is used to return the *Conn.
 func NewPostgres(c context.Context, connString string) *Postgres{
-	conn, err := pgx.Connect(c, connString)
+	pool, err := pgxpool.New(c, connString)
 	if err != nil {
 		return &Postgres{
 			Error: err,
 		}
 	}
 	return &Postgres{
-		Conn: conn,
-		Repo: New(conn),
+		Pool: pool,
+		Repo: New(pool),
 	}
 }
 
@@ -36,8 +36,9 @@ func (q *Postgres) GetError() error {
 
 // Close is used so that we can defer Database.Close.
 // It return the pgx.Conn.Close method.
-func (q *Postgres) Close(c context.Context) error {
-	return q.Conn.Close(c)
+func (q *Postgres) Close(c context.Context) error{
+	q.Pool.Close()
+	return nil
 }
 
 func (q *Postgres) DeleteFile(c context.Context, objkey string) error {

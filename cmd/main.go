@@ -9,7 +9,6 @@ import (
 
 	"github.com/lamprosfasoulas/transfer/pkg/handlers"
 	"github.com/lamprosfasoulas/transfer/pkg/middleware"
-	"github.com/lamprosfasoulas/transfer/pkg/sse"
 	"github.com/lamprosfasoulas/transfer/pkg/start"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -114,6 +113,7 @@ func init() {
 	start.InitAuthProvider()
 	start.InitStorage()
 	start.InitDatabase()
+	start.InitDispatcher()
 
 	//Load the Templates
 	handlers.LoadTemplates()
@@ -150,7 +150,11 @@ func main() {
 	http.HandleFunc("POST /delete/", middleware.RequireAuth(handlers.HandleDelete))
 
 	//Status Handler
-	http.HandleFunc("GET /status/", sse.SSEHandler)
+	http.HandleFunc("GET /status/", middleware.RequireAuth(handlers.SSEHandler))
+	//http.HandleFunc("GET /status/", handlers.SSEHandler)
+
+	//Error handler
+	http.HandleFunc("/error", handlers.HandleError)
 	//OIDC callback handler
 	//http.HandleFunc("GET /status/", handlers.OIDCCallback))
 

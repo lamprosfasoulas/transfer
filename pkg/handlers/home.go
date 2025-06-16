@@ -123,6 +123,7 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Server string
 		User string
+		UploadID string
 		SSL string
 		Space int64
 		Files []database.File
@@ -131,6 +132,7 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 		SSL: "http",
 		Server: start.Domain,
 		User: username,
+		UploadID: "hi",
 		Files: result,
 		MAX: start.MAX_SPACE,
 	}

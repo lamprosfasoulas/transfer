@@ -38,8 +38,10 @@ func HandleDownload(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel:= context.WithCancel(r.Context())
 	defer cancel()
+
 	info := start.Storage.GetObject(ctx, objectKey)
 	defer info.Object.Close()
+
 	if info.Error != nil {
 		log.SetPrefix(fmt.Sprintf("[\033[31mERR\033[0m] "))
 		log.Println(info.Message)

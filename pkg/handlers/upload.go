@@ -26,28 +26,16 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	switch r.Method {
-	case http.MethodGet:
-		data := struct {UploadID string}{UploadID: "hi"}//uuid.NewString()}
-		if !m.GetIsTerminalFromContext(r) {
-			UploadTmpl.Execute(w, data)
-		} else {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
+	//case http.MethodGet:
+	//	data := struct {UploadID string}{UploadID: "hi"}//uuid.NewString()}
+	//	if !m.GetIsTerminalFromContext(r) {
+	//		UploadTmpl.Execute(w, data)
+	//	} else {
+	//		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	//	}
 	case http.MethodPost:
 		ctx, cancel:= context.WithCancel(r.Context())
 		defer cancel()
-
-		//Use this to somehow validate sse access
-		//fmt.Println("From post upload",r.URL.Query().Get("uploadID"))
-
-		//sse.SendEventToSubscriber("hi", &sse.ProgressEvent{
-		//	Filename: "hi",
-		//	Bytes:      0,
-		//	TotalBytes: 0,
-		//	Percentage: 0,
-		//	Message:    "Start",
-		//})
-
 
 		err := r.ParseMultipartForm(50 << 20)
 		if err != nil {
@@ -127,8 +115,9 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 		objID := uuid.New().String() + ext
 		objectKey := username + "/" + objID
 		expireAt := time.Now().Add(7 * 24 * time.Hour)
+		uploadID := r.URL.Query().Get("id")
 
-		prd := storage.NewProgressReader(reader, totalSize, fileName, "hi")//r.URL.Query().Get("uploadID"))
+		prd := storage.NewProgressReader(reader, totalSize, fileName, uploadID, start.Dispatcher)
 		//fgmt.Println("uploadid",prd.UploadID)
 
 		//uploadInfo, err := start.Storage.MinioClient.PutObject(ctx, start.Cfg.MinioBucket, objectKey, prd, prd.Total, minio.PutObjectOptions{
@@ -172,7 +161,7 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 
 		log.SetPrefix(fmt.Sprintf("[\033[34mUPLOAD INFO\033[0m] "))
 		log.Printf("Uploaded: %s (%d bytes)\n", uploadInfo.Filename, uploadInfo.Size)
-		sse.SendEventToSubscriber(prd.UploadID, &sse.ProgressEvent{
+		start.Dispatcher.SendEvent(r.Context(),prd.UploadID, &sse.ProgressEvent{
 			Filename: fileName,
 			Bytes:      uploadInfo.Size,
 			TotalBytes: uploadInfo.Size,

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: false }" x-bind:class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - File Manager</title>
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.0/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    Use Tailwind CDN with all classes -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script defer src="/static/js/alpine.min.js"></script>
+    <!--
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { boxShadow: '0 0 5px rgba(239, 102, 102, 0.5)' },
+                            '50%': { 
+                                boxShadow: '0 0 20px rgba(239, 102, 102, 0.8), 0 0 30px rgba(239, 102, 102, 0.4)' 
+                            },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    -->
+    <style>
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .dark .gradient-bg {
+            background: linear-gradient(135deg, #020617 0%, #1e293b 100%);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(239, 102, 102, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(239, 102, 102, 0.8), 0 0 30px rgba(239, 102, 102, 0.4); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        
+        <!-- Main Error Container -->
+        <div class="max-w-2xl w-full">
+            
+            <!-- Dark Mode Toggle (Top Right) -->
+            <div class="absolute top-6 right-6">
+                <button @click="darkMode = !darkMode" class="p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/60 hover:bg-white/90 dark:hover:bg-slate-800/90 transition-all duration-200 shadow-lg">
+                    <svg x-show="!darkMode" class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <svg x-show="darkMode" class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Error Content -->
+            <div class="text-center">
+                
+                <!-- Animated Error Icon -->
+                <div class="mb-8 flex justify-center">
+                    <div class="relative">
+                        <!-- Background circle with glow effect -->
+                        <div class="w-32 h-32 bg-red-50 dark:bg-red-950 rounded-full flex items-center justify-center pulse-glow">
+                            <!-- Error icon -->
+                            <svg class="w-16 h-16 text-red-500 dark:text-red-400 float-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        
+                        <!-- Floating particles -->
+                        <div class="absolute -top-2 -right-2 w-3 h-3 bg-red-300 rounded-full opacity-60 float-animation" style="animation-delay: -1s;"></div>
+                        <div class="absolute -bottom-2 -left-2 w-2 h-2 bg-red-200 rounded-full opacity-40 float-animation" style="animation-delay: -3s;"></div>
+                        <div class="absolute top-4 -left-4 w-1.5 h-1.5 bg-red-400 rounded-full opacity-50 float-animation" style="animation-delay: -2s;"></div>
+                    </div>
+                </div>
+
+                <!-- Error Message Container -->
+                <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 dark:border-slate-700/60 p-8 shadow-xl">
+                    
+                    <!-- Error Code -->
+                    <div class="mb-4">
+                        <span class="inline-block px-4 py-2 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-300 rounded-lg text-sm font-semibold tracking-wide uppercase">
+                            Error 404
+                        </span>
+                    </div>
+                    
+                    <!-- Main Error Title -->
+                    <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
+                        Page Not Found
+                    </h1>
+                    
+                    <!-- Error Description -->
+                    <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed max-w-lg mx-auto">
+                        The page you're looking for doesn't exist or has been moved.
+                    </p>
+                    
+                    <!-- Action Button -->
+                    <div class="flex justify-center">
+                        <a href="/" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            Go Home
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Help Text -->
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        If this problem persists, please contact our 
+                        <a href="mailto:support@example.com" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors duration-200">
+                            support team
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: false }" x-bind:class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: JSON.parse(localStorage.getItem('darkMode') ?? 'true')}" x-bind:class="{ 'dark': darkMode }" x-cloak>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - File Manager</title>
     <link href="/static/css/styles.css" rel="stylesheet">
     <script defer src="/static/js/alpine.min.js"></script>
+    <style>
+    html[x-cloak] {
+        visibility: hidden;
+    }
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900">
     <div class="min-h-screen">
@@ -17,7 +22,7 @@
                     <h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">Login</h1>
                     <div class="flex items-center">
                         <!-- Dark Mode Toggle -->
-                        <button @click="darkMode = !darkMode" class="p-2 rounded-md bg-slate-100/70 dark:bg-slate-700/70 hover:bg-slate-200/70 dark:hover:bg-slate-600/70 transition-all duration-100">
+                        <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', JSON.stringify(darkMode))" class="p-2 rounded-md bg-slate-100/70 dark:bg-slate-700/70 hover:bg-slate-200/70 dark:hover:bg-slate-600/70 transition-all duration-100">
                             <svg x-show="!darkMode" class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                             </svg>

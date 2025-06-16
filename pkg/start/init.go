@@ -11,6 +11,7 @@ import (
 
 	"github.com/lamprosfasoulas/transfer/pkg/auth"
 	"github.com/lamprosfasoulas/transfer/pkg/database"
+	"github.com/lamprosfasoulas/transfer/pkg/sse"
 	"github.com/lamprosfasoulas/transfer/pkg/storage"
 )
 
@@ -18,6 +19,7 @@ var (
 	Storage 		storage.Storage
 	AuthProvider 	auth.AuthProvider
 	Database 		database.Database
+	Dispatcher		sse.Dispatcher
 	Domain 			string
 	MAX_SPACE		int64
 )
@@ -61,6 +63,15 @@ func InitAuthProvider() {
 			JWTSecret(os.Getenv("JWT_Secret")),
 			JWTExpiry,
 			)
+	case "dev":
+		JWTExpiry := 12 * time.Hour
+		JWTSecret := base64.URLEncoding.EncodeToString([]byte("thisisdeveloptestchangeme"))
+		AuthProvider = auth.NewDevProvider(
+			"dev",
+			"dev",
+			JWTSecret,
+			JWTExpiry,
+			)
 	default:
 		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
 		log.Fatalln("You have not selected an Auth Provider")
@@ -99,6 +110,16 @@ func InitStorage() {
 		//	log.Fatalf("Failed to get MinIO Bucket: %v\n", err)
 		//	return
 		//}
+	case "filesystem":
+		upDir := func (s string) string {
+			if s == "" {
+				return "uploads"
+			}
+			return s
+		}
+		Storage = storage.NewFilesystem(
+			upDir(os.Getenv("UPLOAD_DIR")),
+			)
 	default:
 		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
 		log.Fatalln("You have not selected a Data Store option")
@@ -133,5 +154,16 @@ func InitDatabase() {
 	default:
 		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
 		log.Println("You have not selected a Database option")
+	}
+}
+
+func InitDispatcher() {
+	switch os.Getenv("DISPATCHER") {
+	case "redis":
+		Dispatcher = sse.NewRedisDispatcher(
+			os.Getenv("REDIS_ADDR"),
+			)
+	default:
+		Dispatcher = sse.NewMemDispatcher()
 	}
 }
