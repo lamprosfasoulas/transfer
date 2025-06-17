@@ -166,8 +166,8 @@ func main() {
 
 	//Starting server
 	log.SetPrefix(fmt.Sprintf("[\033[34mSYSTEM INFO\033[0m] "))
-	log.Printf("Starting server on %s …\n", start.Domain)
-	if err := http.ListenAndServe(start.Domain, nil); err != nil {
+	log.Printf("Starting server on %s …\n", ":42069")
+	if err := http.ListenAndServe(":42069", nil); err != nil {
 		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
 		log.Fatalf("Server failed: %v", err)
 	}
