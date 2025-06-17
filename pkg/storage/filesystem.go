@@ -43,7 +43,7 @@ func (f *Filesystem) PutObject(c context.Context, key string, r *ProgressReader)
 	}
 	defer saveFile.Close()
 
-	_, err = io.Copy(saveFile, r.Src)
+	_, err = io.Copy(saveFile, r)
 	if err != nil {
 		return &FileInfo{
 			Error: err,

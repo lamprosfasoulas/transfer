@@ -58,7 +58,6 @@ func InitConfig() {
 	}
 	//5 * 1024 * 1024 * 1024 //Max upload size per user
 	MAX_SPACE = space(os.Getenv("MAX_SPACE"))
-	fmt.Println(MAX_SPACE)
 }
 
 

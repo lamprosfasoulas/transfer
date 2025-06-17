@@ -72,7 +72,6 @@ func (r *RedisDispatcher) DelSubscriber(c context.Context, id string) {
 
 func (r *RedisDispatcher) SendEvent(c context.Context, id string, ev *ProgressEvent) {
 	data, _ := json.Marshal(ev)
-	fmt.Println(string(data))
 	err := r.client.Publish(c, "upload:" + id, data).Err()
 	if err != nil {
 		fmt.Println(err)
