@@ -17,7 +17,6 @@ func SSEHandler (w http.ResponseWriter, r *http.Request) {
 	}
 
 	sub := sse.NewSubscriber()
-	fmt.Println("Sub in sse handler: ",sub)
 	start.Dispatcher.AddSubscriber(r.Context(), uploadID, sub)
 	defer start.Dispatcher.DelSubscriber(r.Context(), uploadID)
 	//SubsMu.RLock()

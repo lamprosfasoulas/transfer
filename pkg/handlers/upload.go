@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"archive/zip"
-	"context"
 	"fmt"
 	"io"
 	"log"
@@ -34,8 +33,7 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 	//		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	//	}
 	case http.MethodPost:
-		ctx, cancel:= context.WithCancel(r.Context())
-		defer cancel()
+		ctx := r.Context()
 
 		err := r.ParseMultipartForm(50 << 20)
 		if err != nil {

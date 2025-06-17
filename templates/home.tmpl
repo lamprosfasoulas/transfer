@@ -429,12 +429,12 @@
                 downloadFile(file) {
                     //alert('Downloading: ' + file.name);
                     //Possibly add an ssl thing variable
-                    const url = `{{ .SSL }}://{{ .Server }}/download/${file.id}`;
+                    const url = `http://{{ .Server }}/download/${file.id}`;
                     window.location.href = url;
                 },
 
                 copyDownloadUrl(file) {
-                    const url = `{{ .SSL }}://{{ .Server }}/download/{{ .User }}/${file.id}`;
+                    const url = `http://{{ .Server }}/download/{{ .User }}/${file.id}`;
                     navigator.clipboard.writeText(url).then(() => {
                         //alert('Download URL copied to clipboard');
                     });

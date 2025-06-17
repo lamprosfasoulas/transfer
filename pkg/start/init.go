@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/lamprosfasoulas/transfer/pkg/auth"
@@ -33,7 +35,30 @@ func InitConfig() {
 	}
 	// I need work
 	// get me from the env
-	MAX_SPACE = 5 * 1024 * 1024 * 1024 //Max upload size per user
+	space := func (s string) int64 {
+		var mult int64
+		var size int64
+		var atoi int
+		var err error
+		if strings.HasSuffix(s,"mb") {
+			mult = 1024 * 1024
+			atoi, err = strconv.Atoi(strings.TrimSuffix(s, "mb"))
+			size = int64(atoi)
+		} else if strings.HasSuffix(s, "gb"){
+			mult = 1024 * 1024 * 1024
+			atoi, err = strconv.Atoi(strings.TrimSuffix(s, "gb"))
+			size = int64(atoi)
+		} 
+		if err != nil {
+			log.Fatal("Could not determine size limit")
+		}
+
+		return size * mult
+		
+	}
+	//5 * 1024 * 1024 * 1024 //Max upload size per user
+	MAX_SPACE = space(os.Getenv("MAX_SPACE"))
+	fmt.Println(MAX_SPACE)
 }
 
 
