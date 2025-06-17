@@ -201,10 +201,10 @@
                         <div x-show="uploadStatus !== 'idle'" class="flex flex-col items-center justify-center py-8">
                             <div class="relative w-24 h-24 mb-4">
                                 <!-- Background circle -->
-                                <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                                    <svg class="w-24 h-24" :class="showSpinner ? 'animate-spin duration-800 origin-center' : 'transform -rotate-90'" viewBox="0 0 100 100">
                                     <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" class="text-slate-200 dark:text-slate-600"/>
                                     <!-- Progress circle -->
-                                    <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" 
+                                    <circle x-show="!showSpinner" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" 
                                         :class="{
                                             'text-emerald-500': uploadStatus === 'uploading',
                                             'text-emerald-600': uploadStatus === 'complete',
@@ -214,6 +214,14 @@
                                         :stroke-dashoffset="`${2 * Math.PI * 40 - (uploadProgress / 100) * 2 * Math.PI * 40}`"
                                         stroke-linecap="round"
                                         class="transition-all duration-100 "/>
+
+                                    <!-- Spinner circle -->
+                                    <circle x-show="showSpinner" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none" 
+                                        class="text-emerald-500"
+                                        stroke-dasharray="60 200"
+                                        stroke-dashoffset="0"
+                                        stroke-linecap="round"
+                                    />
                                 </svg>
                                 <!-- Percentage text -->
                                 <div class="absolute inset-0 flex items-center justify-center">
@@ -266,7 +274,6 @@
             </div>
         </div>
     </div>
-
     <script>
         function fileManager() {
             return {
@@ -288,6 +295,7 @@
                 progressWidth: 0,
                 uploadProgress: 0,
                 uploadStatus: 'idle', // idle, uploading, complete, error
+                showSpinner: true,
                 
                 // Server can set these values in bytes
                 usedBytes: {{ .Space }},//7301365760, // Example: 6.8 GB in bytes
@@ -327,11 +335,16 @@
                     const eventSource = new EventSource('/status?id={{ .UploadID }}');
 
                     eventSource.onopen = (event) => {
-                        this.performUpload();
+                        this.showSpinner = true;
+                        setTimeout(() => {
+                            this.performUpload();
+                        }, 1000);
+                        console.log("Source open");
                     };
                     
                     eventSource.onmessage = (event) => {
-                        //console.log(event.data)
+                        this.showSpinner = false;
+                        console.log(event.data)
                         const data = JSON.parse(event.data);
                         
                         if (data.percentage !== undefined) {
@@ -346,6 +359,7 @@
                             eventSource.close();
                             setTimeout(() => {
                                 this.resetUploadModal();
+                                this.showSpinner = true;
                                 //// Refresh file list or add new files to the list
                                 location.reload(); // Simple refresh, or implement dynamic update
                             }, 1500);

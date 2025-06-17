@@ -82,24 +82,28 @@ module.exports = {
                 '18': '4.5rem',
                 '88': '22rem',
             },
-            // Add custom animations
             animation: {
-                'float': 'float 6s ease-in-out infinite',
+                spin: 'spin 1s linear infinite',
+                float: 'float 6s ease-in-out infinite',
                 'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
             },
-            // Add custom keyframes
             keyframes: {
+                spin: {
+                    to: { transform: 'rotate(360deg)' },
+                },
                 float: {
                     '0%, 100%': { transform: 'translateY(0px)' },
                     '50%': { transform: 'translateY(-20px)' },
                 },
                 'pulse-glow': {
                     '0%, 100%': { boxShadow: '0 0 5px rgba(239, 102, 102, 0.5)' },
-                    '50%': { 
-                        boxShadow: '0 0 20px rgba(239, 102, 102, 0.8), 0 0 30px rgba(239, 102, 102, 0.4)' 
+                    '50%': {
+                        boxShadow:
+                        '0 0 20px rgba(239, 102, 102, 0.8), 0 0 30px rgba(239, 102, 102, 0.4)',
                     },
                 },
             },
+            // Add custom animations
             // Add custom box shadows
             //boxShadow: {
             //    'glow': '0 0 20px rgba(239, 102, 102, 0.8), 0 0 30px rgba(239, 102, 102, 0.4)',
@@ -110,12 +114,13 @@ module.exports = {
     },
     plugins: [],
       safelist: [
-    'float-animation',
-    'pulse-glow',
-    'w-3', 'h-3',
-    'w-2', 'h-2',
-    'w-1.5', 'h-1.5',
-    'bg-red-200', 'bg-red-300', 'bg-red-400',
-    'opacity-40', 'opacity-50', 'opacity-60'
+        'animate-spin',
+        'float-animation',
+        'pulse-glow',
+        'w-3', 'h-3',
+        'w-2', 'h-2',
+        'w-1.5', 'h-1.5',
+        'bg-red-200', 'bg-red-300', 'bg-red-400',
+        'opacity-40', 'opacity-50', 'opacity-60'
   ]
 }
