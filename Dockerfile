@@ -15,6 +15,8 @@ COPY . .
 # Build Tailwind CSS
 RUN npm run build-css
 
+RUN mkdir -p static/js && cp node_modules/alpinejs/dist/cdn.min.js static/js/alpine.min.js
+
 # Build stage for Go application
 FROM golang:1.24-alpine AS go-builder
 
