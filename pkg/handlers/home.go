@@ -51,6 +51,7 @@ func bites(bytes int64) string {
 // }
 func (m *MainHandlers) Home(w http.ResponseWriter, r *http.Request) {
 	username := GetUsernameFromContext(r)
+	fmt.Println("but home username is ", username)
 	//username := w.Header().Get("Authorization")
 	if username == "" {
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -60,16 +61,10 @@ func (m *MainHandlers) Home(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	result, err := m.Database.GetUserFiles(ctx, username)
 	if err != nil {
-		//log.SetPrefix(fmt.Sprintf("[\033[31mHOME ERR\033[0m] "))
-		//log.Printf("Get files from database failed: %v", err)
 		m.Logger.Error(logger.Dat).Writef("Get files from database error: ", err)
 		//Those should go in a func together
 		http.Error(w, fmt.Sprintf("Failed to get files: %v",err), http.StatusInternalServerError)
 	}
-	//res := start.Storage.ListObjects(ctx, username)
-	//re := (*res)[0].ExpireAt
-	//fmt.Println("Left: ", int(re)/24)
-	//fmt.Println("Left: ", int(re)%24)
 	data := struct {
 		Server string
 		User string

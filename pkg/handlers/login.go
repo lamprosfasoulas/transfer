@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -28,10 +27,8 @@ func (a *AuthHandler) LoginGet(w http.ResponseWriter, r *http.Request) {
 
 
 func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	//log.SetPrefix(fmt.Sprintf("[\033[31mERR\033[0m] "))
 	//First look is user is signed in
 	username := GetUsernameFromContext(r) //m.GetUserFromRequest(r)
-	fmt.Println("are we here",username)
 	if username != "" {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return

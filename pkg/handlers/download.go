@@ -42,8 +42,6 @@ func (m *MainHandlers) Download(w http.ResponseWriter, r *http.Request) {
 	defer info.Object.Close()
 
 	if err != nil {
-		//log.SetPrefix(fmt.Sprintf("[\033[31mERR\033[0m] "))
-		//log.Println(info.Message)
 		m.Logger.Error(logger.Sto).Writef("Error getting object", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

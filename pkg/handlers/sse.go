@@ -18,13 +18,11 @@ func (m *MainHandlers) SSEHandler (w http.ResponseWriter, r *http.Request) {
 	sub := sse.NewSubscriber()
 	m.Dispatcher.AddSubscriber(r.Context(), uploadID, sub)
 	defer m.Dispatcher.DelSubscriber(r.Context(), uploadID)
-	//SubsMu.RLock()
-	//sub := Subs[uploadID]
-	//SubsMu.RUnlock()
-	//SSE Headers
+
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
+
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)

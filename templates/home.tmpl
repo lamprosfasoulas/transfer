@@ -443,7 +443,7 @@
                 downloadFile(file) {
                     //alert('Downloading: ' + file.name);
                     //Possibly add an ssl thing variable
-                    const url = `http://{{ .Server }}/download/${file.id}`;
+                    const url = `http://{{ .Server }}/download/{{ .User }}/${file.id}`;
                     window.location.href = url;
                 },
 
