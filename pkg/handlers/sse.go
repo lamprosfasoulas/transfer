@@ -6,10 +6,9 @@ import (
 	"net/http"
 
 	"github.com/lamprosfasoulas/transfer/pkg/sse"
-	"github.com/lamprosfasoulas/transfer/pkg/start"
 )
 
-func SSEHandler (w http.ResponseWriter, r *http.Request) {
+func (m *MainHandlers) SSEHandler (w http.ResponseWriter, r *http.Request) {
 	uploadID := r.URL.Query().Get("id")
 	if uploadID == "" {
 		http.Error(w, "Missing id", http.StatusBadRequest)
@@ -17,8 +16,8 @@ func SSEHandler (w http.ResponseWriter, r *http.Request) {
 	}
 
 	sub := sse.NewSubscriber()
-	start.Dispatcher.AddSubscriber(r.Context(), uploadID, sub)
-	defer start.Dispatcher.DelSubscriber(r.Context(), uploadID)
+	m.Dispatcher.AddSubscriber(r.Context(), uploadID, sub)
+	defer m.Dispatcher.DelSubscriber(r.Context(), uploadID)
 	//SubsMu.RLock()
 	//sub := Subs[uploadID]
 	//SubsMu.RUnlock()
@@ -35,7 +34,7 @@ func SSEHandler (w http.ResponseWriter, r *http.Request) {
 	flusher.Flush()
 
 	defer func() {
-		start.Dispatcher.DelSubscriber(r.Context(), uploadID)
+		m.Dispatcher.DelSubscriber(r.Context(), uploadID)
 		close(sub.Ch)
 	}()
 

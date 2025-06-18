@@ -2,17 +2,15 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 
-	m "github.com/lamprosfasoulas/transfer/pkg/middleware"
-	"github.com/lamprosfasoulas/transfer/pkg/start"
+	"github.com/lamprosfasoulas/transfer/pkg/logger"
 )
 
 //Handler for Deleting files
-func HandleDelete(w http.ResponseWriter, r *http.Request) {
-	username := m.GetUsernameFromContext(r)
+func (m *MainHandlers) Delete(w http.ResponseWriter, r *http.Request) {
+	username := GetUsernameFromContext(r)
 	if username == "" {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
@@ -44,32 +42,36 @@ func HandleDelete(w http.ResponseWriter, r *http.Request) {
 	//	log.Printf("Error deleting %q: %v\n", objectKey, err)
 	//}
 
-	info := start.Storage.DeleteObject(ctx, objectKey)
-	if info.Error != nil {
-		log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
-		log.Printf("Error deleting object: %v", info.Message)
+	_, err := m.Storage.DeleteObject(ctx, objectKey)
+	if err!= nil {
+		//log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
+		//log.Printf("Error deleting object: %v", info.Message)
+		m.Logger.Error(logger.Sto).Writef("Erro deleting object: %v", err)
 		//http.Error(w, info.Message, http.StatusBadRequest)
 		// We still delete from db
 		//return
 	}
 
-	err := start.Database.DeleteFile(ctx, objectKey)
+	err = m.Database.DeleteFile(ctx, objectKey)
 	if err != nil {
-		log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
-		log.Printf("Error deleting file from database: %v", err)
-		http.Error(w, info.Message, http.StatusBadRequest)
+		//log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
+		//log.Printf("Error deleting file from database: %v", err)
+		m.Logger.Error(logger.Del).Writef("Error deleting file from database", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = start.Database.RecalculateUserSpace(ctx, username)
+	err = m.Database.RecalculateUserSpace(ctx, username)
 	if err != nil {
-		log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
-		log.Printf("Error recalculating user used space: %v", err)
-		http.Error(w, info.Message, http.StatusBadRequest)
+		//log.SetPrefix(fmt.Sprintf("[\033[31mDELETE ERR\033[0m] "))
+		//log.Printf("Error recalculating user used space: %v", err)
+		m.Logger.Error(logger.Del).Writef("Error recalculating user used space", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 
-	log.SetPrefix(fmt.Sprintf("[\033[34mDELETE INFO\033[0m] "))
-	log.Printf("File %s deleted successfully\n",objectKey)
+	//log.SetPrefix(fmt.Sprintf("[\033[34mDELETE INFO\033[0m] "))
+	//log.Printf("File %s deleted successfully\n",objectKey)
+	m.Logger.Info(logger.Del).Write(fmt.Sprintf("File %s deleted successfully\n", objectKey))
 	http.Redirect(w, r, "/", http.StatusFound)
 }

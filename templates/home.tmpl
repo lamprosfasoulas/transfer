@@ -77,8 +77,8 @@
                         </thead>
                         <tbody class="bg-white/50 dark:bg-slate-800/50 divide-y divide-slate-200/40 dark:divide-slate-700/40">
                             <template x-for="file in files" :key="file.id">
-                                <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-700/30 transition-colors duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-700/30 transition-colors duration-150 h-auto">
+                                    <td class="px-6 py-4 truncate">
                                         <div class="text-sm font-medium text-slate-900 dark:text-slate-100" x-text="file.name"></div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
@@ -132,7 +132,7 @@
                                                  x-transition:leave="transition ease-in duration-150" 
                                                  x-transition:leave-start="opacity-100 scale-100" 
                                                  x-transition:leave-end="opacity-0 scale-95"
-                                                 class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-10">
+                                                 class="absolute top-0 right-0  mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-50">
                                                 <div class="py-1">
 
                                                     <!-- File info for mobile (shown only when menu is open) -->
@@ -339,12 +339,12 @@
                         setTimeout(() => {
                             this.performUpload();
                         }, 1000);
-                        console.log("Source open");
+                        //console.log("Source open");
                     };
                     
                     eventSource.onmessage = (event) => {
                         this.showSpinner = false;
-                        console.log(event.data)
+                        //console.log(event.data)
                         const data = JSON.parse(event.data);
                         
                         if (data.percentage !== undefined) {

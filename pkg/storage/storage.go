@@ -38,10 +38,10 @@ func bites(bytes int64) string {
 // It is used to store, retrieve and delete files from 
 // storage.
 type Storage interface {
-	PutObject		(context.Context, string, *ProgressReader) *FileInfo
-	GetObject		(context.Context, string) *FileInfo
+	PutObject		(context.Context, string, *ProgressReader) (*FileInfo, error)
+	GetObject		(context.Context, string) (*FileInfo, error)
 	//ListObjects		(context.Context, string) *[]FileInfo
-	DeleteObject 	(context.Context, string) *FileInfo
+	DeleteObject 	(context.Context, string) (*FileInfo, error)
 	GetError 		() error
 }
 
@@ -102,9 +102,7 @@ type FileInfo struct {
 	DispSize 	string // Not Used
 	URL			string // Not USed
 
-	Error 		error // Captures the Error
 	Content 	string //Content-Type
-	Message		string // Captures the message
 
 	LastMod		time.Time // Not Used
 	ExpireAt	int // Not Used

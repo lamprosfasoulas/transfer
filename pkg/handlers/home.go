@@ -4,13 +4,11 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/lamprosfasoulas/transfer/pkg/database"
-	m "github.com/lamprosfasoulas/transfer/pkg/middleware"
-	"github.com/lamprosfasoulas/transfer/pkg/start"
+	"github.com/lamprosfasoulas/transfer/pkg/logger"
 )
 
 func bites(bytes int64) string {
@@ -51,8 +49,8 @@ func bites(bytes int64) string {
 // 	Files []database.File
 // 	MAX int64
 // }
-func HandleHome(w http.ResponseWriter, r *http.Request) {
-	username := m.GetUsernameFromContext(r)
+func (m *MainHandlers) Home(w http.ResponseWriter, r *http.Request) {
+	username := GetUsernameFromContext(r)
 	//username := w.Header().Get("Authorization")
 	if username == "" {
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -60,10 +58,11 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	result, err := start.Database.GetUserFiles(ctx, username)
+	result, err := m.Database.GetUserFiles(ctx, username)
 	if err != nil {
-		log.SetPrefix(fmt.Sprintf("[\033[31mHOME ERR\033[0m] "))
-		log.Printf("Get files from database failed: %v", err)
+		//log.SetPrefix(fmt.Sprintf("[\033[31mHOME ERR\033[0m] "))
+		//log.Printf("Get files from database failed: %v", err)
+		m.Logger.Error(logger.Dat).Writef("Get files from database error: ", err)
 		//Those should go in a func together
 		http.Error(w, fmt.Sprintf("Failed to get files: %v",err), http.StatusInternalServerError)
 	}
@@ -79,17 +78,17 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 		Files []database.File
 		MAX int64
 	}{
-		Server: start.Domain,
+		Server: m.Domain,
 		User: username,
 		UploadID: uuid.NewString(), //"hi",
 		Files: result,
-		MAX: start.MAX_SPACE,
+		MAX: m.MAX_SPACE,
 	}
 	for _, r := range result {
 		data.Space += r.Size
 	}
 	// Response
-	if m.GetIsTerminalFromContext(r) {
+	if GetIsTerminalFromContext(r) {
 		HomeTmplTerm.Execute(w, data)
 	} else {
 		HomeTmpl.Execute(w, data)
