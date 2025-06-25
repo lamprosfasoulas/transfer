@@ -278,7 +278,7 @@ func initDispatcher() {
 
 func initLogger() {
 	var err error
-	logProvider, err = logger.NewLogger("testfile.log")
+	logProvider, err = logger.NewLogger("logfile.log")
 	if err != nil {
 		log.Fatalf("Failed to init logger: %v", err)
 	}

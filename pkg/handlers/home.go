@@ -51,7 +51,7 @@ func bites(bytes int64) string {
 // }
 func (m *MainHandlers) Home(w http.ResponseWriter, r *http.Request) {
 	username := GetUsernameFromContext(r)
-	fmt.Println("but home username is ", username)
+	//fmt.Println("but home username is ", username)
 	//username := w.Header().Get("Authorization")
 	if username == "" {
 		http.Redirect(w, r, "/login", http.StatusFound)

@@ -189,6 +189,12 @@
                         <!-- File Selection (only show when not uploading) -->
                         <div x-show="uploadStatus === 'idle'">
                             <input type="file" multiple @change="handleFileSelection" class="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 dark:file:bg-slate-700 dark:file:text-slate-300 dark:hover:file:bg-slate-600 transition-all duration-100">
+                            <input
+                            type="text"
+                            x-model="filename"
+                            placeholder="Custom filename..."
+                            class="w-full px-3 py-2 mt-4 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm transition-colors duration-100"
+                            >
                             <div x-show="selectedFiles.length > 0" class="mt-4">
                                 <p class="text-sm text-slate-600 dark:text-slate-400 mb-2 font-medium">Selected documents:</p>
                                 <template x-for="file in selectedFiles" :key="file.name">
@@ -301,6 +307,7 @@
                 usedBytes: {{ .Space }},//7301365760, // Example: 6.8 GB in bytes
                 totalBytes: {{ .MAX }}, //10737418240, // Example: 10 GB in bytes
                 calcBytes: 0,
+                filename: "",
 
                 init() {
                     // Start progress bar animation after 100ms
@@ -380,6 +387,9 @@
 
                 performUpload() {
                     const formData = new FormData();
+
+                    // Add the custom filename, the user sent
+                    formData.append(`filename`, this.filename);
                     
                     // Add all selected files to FormData
                     this.selectedFiles.forEach((file) => {

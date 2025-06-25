@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,12 +34,11 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 
 	var fileName 	string
 	var ext 		string
+	var ch = make(chan string)
 
 	mr, err := r.MultipartReader()
 	pr, pw := io.Pipe()
 	zw := zip.NewWriter(pw)
-	fileName = fmt.Sprintf("archive-%d.zip", time.Now().Unix())
-	ext = filepath.Ext(fileName)
 
 	go func(){
 		defer pw.Close()
@@ -52,6 +52,21 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 				m.Logger.Error(logger.Upl).Writef("Error opening file", err)
 				return
 			}
+			if part.FormName() == "filename" {
+				tmpname := make([]byte, 32)
+				n, err := part.Read(tmpname)
+
+				if err != nil && err != io.EOF {
+					tmpname = nil
+					continue
+				}
+				if n == 0 {
+					ch <- fmt.Sprintf("archive-%d.zip",time.Now().Unix())
+				} else {
+					ch <- fmt.Sprintf("%s.zip",sanitizeFilename(tmpname[:n]))
+				}
+				continue
+			}
 
 			w, err := zw.Create(part.FileName())
 			if err != nil {
@@ -64,6 +79,9 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}()
+
+	fileName = <-ch //fmt.Sprintf("arcive-%d.zip", time.Now().Unix())
+	ext = filepath.Ext(fileName)
 
 	objID := uuid.New().String() + ext
 	objectKey := username + "/" + objID
@@ -129,4 +147,14 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Successful upload: %v", data.DownloadLink)
 		return
 	}
+}
+
+func sanitizeFilename(b []byte) string {
+	name := filepath.Base(string(b))
+	re := regexp.MustCompile(`[^a-zA-Z0-9._-]`)
+	name = re.ReplaceAllString(name, "_")
+	//if len(name) > 15 {
+	//	name = name[:15]
+	//}
+	return name
 }
