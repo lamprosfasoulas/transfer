@@ -47,8 +47,8 @@ func (r *RedisDispatcher) listen() {
 		json.Unmarshal([]byte(msg.Payload), &ev)
 
 		r.subsMu.RLock()
-		defer r.subsMu.RUnlock()
 		sub, ok := r.subs[id]
+		r.subsMu.RUnlock()
 		if ok {
 			select {
 			case sub.Ch <- ev:

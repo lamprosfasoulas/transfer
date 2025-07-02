@@ -30,8 +30,8 @@ func (m *MemDispatcher) DelSubscriber(c context.Context, id string) {
 }
 
 func (m *MemDispatcher) SendEvent(c context.Context, id string, ev *ProgressEvent) {
-	m.subsMu.RLock()
-	defer m.subsMu.RUnlock()
+	m.subsMu.Lock()
+	defer m.subsMu.Unlock()
 
 	if sub, ok := m.subs[id]; ok {
 		select {

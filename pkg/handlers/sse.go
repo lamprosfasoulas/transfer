@@ -17,7 +17,7 @@ func (m *MainHandlers) SSEHandler (w http.ResponseWriter, r *http.Request) {
 
 	sub := sse.NewSubscriber()
 	m.Dispatcher.AddSubscriber(r.Context(), uploadID, sub)
-	defer m.Dispatcher.DelSubscriber(r.Context(), uploadID)
+	//defer m.Dispatcher.DelSubscriber(r.Context(), uploadID)
 
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
