@@ -86,18 +86,11 @@ func (l *Logger) Warn(s ...string) *Logger {
 }
 
 func (l *Logger) Write(msg string) {
-	l.logger.Output(2, fmt.Sprintf(
-		"%s",
-		msg,
-		))
+	l.logger.Output(2, fmt.Sprintf("%s", msg))
 }
 
 func (l *Logger) Writef(msg string, err error) {
-	l.logger.Output(2, fmt.Sprintf(
-		"%s: %v",
-		msg,
-		err,
-		))
+	l.logger.Output(2, fmt.Sprintf("%s: %v", msg, err))
 }
 
 //func (l *Logger) Error(msg string, err error) {

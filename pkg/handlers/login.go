@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
-
 )
 
 
@@ -53,8 +54,9 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	// Response
 	if GetIsTerminalFromContext(r) {//.Context().Value("isTerminal").(bool) {
+		fmt.Println("is terminal")
 		w.Header().Set("Content-Type", "application/json")
-		//json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+		json.NewEncoder(w).Encode(map[string]string{"token": resp.JwtToken})
 		return
 	} else {
 		//w.Header().Set("Authorization", fmt.Sprintf("Bearer %s",resp.JwtToken))

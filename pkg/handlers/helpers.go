@@ -57,7 +57,7 @@ func (a *AuthHandler) SetAuthCookie(w http.ResponseWriter, value string, expiry 
 		Path: "/",
 		MaxAge: int(expiry.Seconds()),
 		HttpOnly: true,
-		Secure: false,
+		Secure: true,
 		SameSite: http.SameSiteLaxMode,
 	})
 }
@@ -73,7 +73,7 @@ func (a *AuthHandler) ClearAuthCookie(w http.ResponseWriter) {
 		Path: "",
 		MaxAge: -1,
 		HttpOnly: true,
-		Secure: false,
+		Secure: true,
 		SameSite: http.SameSiteLaxMode,
 	})
 }
