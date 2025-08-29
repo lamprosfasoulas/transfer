@@ -88,7 +88,10 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 	expireAt := time.Now().Add(7 * 24 * time.Hour)
 	uploadID := r.URL.Query().Get("id")
 
-	prd := storage.NewProgressReader(pr, -1, fileName, uploadID, m.Dispatcher)
+	// Here we set the total bytes equal to r.ContentLength to track the upload
+	// progress (estimate). When the PutObject function is called the size is
+	// set to -1. See pkg/storage/minio.go
+	prd := storage.NewProgressReader(pr, r.ContentLength, fileName, uploadID, m.Dispatcher)
 
 	uploadInfo, err := m.Storage.PutObject(ctx, objectKey, prd) 
 	if err != nil {

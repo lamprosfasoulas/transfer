@@ -74,9 +74,9 @@ func (pr *ProgressReader) Read(p []byte) (n int, err error) {
     n, err = pr.Src.Read(p)
     if n > 0 {
         pr.Red += int64(n)
-		var pct float64
+		var pct int
 		if pr.Total > 0 {
-			pct = float64(pr.Red) / float64(pr.Total) * 100
+			pct = int((float64(pr.Red) / float64(pr.Total)) * 100)
 		}
 		ev := sse.NewProgressEvent(
 			pr.Filename,

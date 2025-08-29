@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -39,7 +38,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := a.AuthProvider.Authenticate(r)
 	if resp.Error != nil {
-		a.Logger.Warn().Writef("Authentication error: %v\n", resp.Error)
+		a.Logger.Warn().Writef("Authentication error", resp.Error)
 		http.Error(w, "Internal error during auth", http.StatusInternalServerError)
 		return
 	}
@@ -54,7 +53,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	// Response
 	if GetIsTerminalFromContext(r) {//.Context().Value("isTerminal").(bool) {
-		fmt.Println("is terminal")
+		//fmt.Println("is terminal")
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"token": resp.JwtToken})
 		return

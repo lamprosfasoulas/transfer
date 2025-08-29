@@ -2,6 +2,7 @@ package sse
 
 import (
 	"context"
+	"time"
 )
 
 type Dispatcher interface {
@@ -22,7 +23,7 @@ type ProgressEvent struct {
     Filename    string  `json:"filename,omitempty"`
     Bytes       int64   `json:"bytes"`
     TotalBytes  int64   `json:"total_bytes,omitempty"`
-    Percentage  float64 `json:"percentage"`
+    Percentage  int `json:"percentage"`
     Message     string  `json:"message,omitempty"`
 }
 
@@ -30,10 +31,14 @@ type ProgressEvent struct {
 type Subscriber struct {
 	Ch 		chan ProgressEvent // Channel capturing ProgressEvents
 	Closing chan struct{} // Channel to signal the closing of the connection
+	lastPct int
+	lastTime time.Time
+	pctStep int
+	timeStep time.Duration
 }
 
 // NewProgressEvent is a constructor for ProgressEvent
-func NewProgressEvent(filename, message string, bytes, totalbytes int64, pct float64) *ProgressEvent{
+func NewProgressEvent(filename, message string, bytes, totalbytes int64, pct int) *ProgressEvent{
 	return &ProgressEvent{
 		Filename: filename,
 		Bytes: bytes,
@@ -44,10 +49,13 @@ func NewProgressEvent(filename, message string, bytes, totalbytes int64, pct flo
 }
 
 // NewSubscriber is a constructor for each new Subscriber.
-func NewSubscriber () *Subscriber {
+func NewSubscriber (pStep int, tStep time.Duration) *Subscriber {
 	return &Subscriber{
 		Ch: make(chan ProgressEvent),
 		Closing: make(chan struct {}),
+		lastTime: time.Now().Add(-500 * time.Millisecond),
+		pctStep: pStep,
+		timeStep: tStep,
 	}
 }
 

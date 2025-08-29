@@ -61,7 +61,7 @@ func (m *MainHandlers) Home(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	result, err := m.Database.GetUserFiles(ctx, username)
 	if err != nil {
-		m.Logger.Error(logger.Dat).Writef("Get files from database error: ", err)
+		m.Logger.Error(logger.Dat).Writef("Get files from database error", err)
 		//Those should go in a func together
 		http.Error(w, fmt.Sprintf("Failed to get files: %v",err), http.StatusInternalServerError)
 	}

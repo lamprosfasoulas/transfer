@@ -70,7 +70,7 @@ func janitor() {
 
 		for _, file := range files {
 			//fmt.Println(file.Expiresat.Sub(time.Now().Add(7 * 25 * time.Hour)))
-			expired := 0 > file.Expiresat.Sub(time.Now())
+			expired := 0 > time.Until(*file.Expiresat)
 			if expired {
 				//log.SetPrefix(fmt.Sprintf("[\033[34mJANITOR INFO\033[0m] "))
 				logProvider.Warn(logger.Jan).Write(fmt.Sprintf("File %s is expired and is being deleted!\n", file.Objkey))
@@ -121,8 +121,8 @@ func initAuthProvider() {
 				bytes := make([]byte, 32)
 				_, err := rand.Read(bytes)
 				if err != nil {
-					log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-					log.Fatalln("Failed to create JWTSecret:", err)
+					//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+					logProvider.Error().Fatalf("Failed to create JWTSecret:", err)
 				}
 				return base64.URLEncoding.EncodeToString(bytes)
 			} 
@@ -148,8 +148,8 @@ func initAuthProvider() {
 			JWTExpiry,
 			)
 	default:
-		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-		log.Fatalln("You have not selected an Auth Provider")
+		//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+		logProvider.Error().Fatal("You have not selected an Auth Provider")
 	}
 }
 
@@ -158,8 +158,8 @@ func initDatabase() {
 	case "postgres":
 		postgresUrl := func (s string) string {
 			if s == "" {
-				log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-				log.Fatalln("Database url is empty")
+				//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+				logProvider.Error().Fatal("Database url is empty")
 			}
 			return s
 		}
@@ -175,20 +175,20 @@ func initDatabase() {
 			postgresUrl(os.Getenv("DB_URL")),
 			)
 		if err := databaseProvider.GetError(); err != nil {
-			log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-			log.Fatalf("Failed to connect to postgres: %v\n", err)
+			//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+			logProvider.Error().Fatalf("Failed to connect to postgres", err)
 		}
 	default:
-		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-		log.Println("You have not selected a Database option")
+		//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+		logProvider.Error().Fatal("You have not selected a Database option")
 	}
 }
 
 func initConfig() {
 	domain = os.Getenv("DOMAIN")
 	if domain == "" {
-		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-		log.Fatalln("Domain missing ...")
+		//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+		logProvider.Error().Fatal("Domain missing ...")
 	}
 	// I need work
 	// get me from the env
@@ -239,8 +239,8 @@ func initStorage() {
 			)
 
 		if err := storageProvider.GetError(); err != nil {
-			log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-			log.Fatalf("Failed to init MinIO client: %v\n", err)
+			//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+			logProvider.Error().Fatalf("Failed to init MinIO client", err)
 			return
 		}
 		//ctx := context.Background()
@@ -260,8 +260,8 @@ func initStorage() {
 			upDir(os.Getenv("UPLOAD_DIR")),
 			)
 	default:
-		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-		log.Fatalln("You have not selected a Data Store option")
+		//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+		logProvider.Error().Fatal("You have not selected a Data Store option")
 	}
 }
 
@@ -300,12 +300,12 @@ func init() {
 	//log.Fatalln("You have not specified AUTH_PROVIDER")
 
 	//}
+	initLogger()
 	initConfig()
 	initAuthProvider()
 	initStorage()
 	initDatabase()
 	initDispatcher()
-	initLogger()
 
 	//Load the Templates
 	handlers.LoadTemplates()
@@ -380,7 +380,7 @@ func main() {
 	//logProvider.Error().Write("tesing error messages")
 	//logProvider.Info().Write("Testing once more")
 	if err := http.ListenAndServe(":42069", nil); err != nil {
-		log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
-		log.Fatalf("Server failed: %v", err)
+		//log.SetPrefix(fmt.Sprintf("[\033[31mSYSTEM ERR\033[0m] "))
+		logProvider.Error().Fatalf("Server failed: %v", err)
 	}
 }

@@ -41,7 +41,7 @@ func (m *MainHandlers) Delete(w http.ResponseWriter, r *http.Request) {
 
 	_, err := m.Storage.DeleteObject(ctx, objectKey)
 	if err!= nil {
-		m.Logger.Error(logger.Sto).Writef("Erro deleting object: %v", err)
+		m.Logger.Error(logger.Sto).Writef("Erro deleting object", err)
 		//http.Error(w, info.Message, http.StatusBadRequest)
 		// We still delete from db
 		//return

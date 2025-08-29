@@ -54,7 +54,7 @@ func NewMinio(endpoint, access, passkey, bucket string, ssl bool) *Minio {
 
 
 func (m *Minio) PutObject(c context.Context, key string, r *ProgressReader) (*FileInfo, error) {
-	uploadInfo, err := m.MinioClient.PutObject(c, m.MinioBucket, key, r, r.Total,
+	uploadInfo, err := m.MinioClient.PutObject(c, m.MinioBucket, key, r, -1,
 		minio.PutObjectOptions{
 			UserMetadata: map[string]string{
 				"filename": r.Filename,

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/lamprosfasoulas/transfer/pkg/sse"
 )
@@ -15,7 +16,7 @@ func (m *MainHandlers) SSEHandler (w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sub := sse.NewSubscriber()
+	sub := sse.NewSubscriber(1, 500 * time.Millisecond)
 	m.Dispatcher.AddSubscriber(r.Context(), uploadID, sub)
 	//defer m.Dispatcher.DelSubscriber(r.Context(), uploadID)
 

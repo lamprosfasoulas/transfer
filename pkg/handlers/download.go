@@ -39,13 +39,12 @@ func (m *MainHandlers) Download(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	info, err := m.Storage.GetObject(ctx, objectKey)
-	defer info.Object.Close()
-
 	if err != nil {
 		m.Logger.Error(logger.Sto).Writef("Error getting object", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	defer info.Object.Close()
 
 	reqParam := make(url.Values)
 	reqParam.Set("response-content-disposition", fmt.Sprintf(`attachment; filename="%s"`, info.Filename))

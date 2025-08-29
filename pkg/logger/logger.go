@@ -30,8 +30,8 @@ const (
 type Logger struct {
 	logger *log.Logger
 	//ErrorLogger *log.Logger
-	w io.Writer
 	file *os.File
+	w io.Writer
 }
 
 func NewLogger(logFilePath string) (*Logger, error) {
@@ -40,10 +40,13 @@ func NewLogger(logFilePath string) (*Logger, error) {
 		return nil, err
 	}
 
+	mw := io.MultiWriter(os.Stdout, file)
+
 	return &Logger{
 		logger: log.New(os.Stdout, "[\033[34;1mSYSTEM INFO\033[0m] ", log.Ldate|log.Ltime|log.Lshortfile),
 		//ErrorLogger: log.New(file, "[\033[31mSYSTEM ERR\033[0m] ", log.Ldate|log.Ltime|log.Lshortfile),
 		file: file,
+		w: mw,
 	}, nil
 }
 
@@ -68,7 +71,7 @@ func (l *Logger) Error (s ...string) *Logger {
 	}
 	l.logger.SetPrefix(fmt.Sprintf("%s[%s%s ERR%s%s]%s ", BOLD, RED_BOLD, mod, RESET, BOLD, RESET))
 	//l.logger.SetPrefix(fmt.Sprintf("[\033[31;1m%s ERR\033[0m] ", mod))
-	l.logger.SetOutput(l.file)
+	l.logger.SetOutput(l.w)
 	return l
 }
 
@@ -81,7 +84,7 @@ func (l *Logger) Warn(s ...string) *Logger {
 	}
 	l.logger.SetPrefix(fmt.Sprintf("%s[%s%s WARN%s%s]%s ", BOLD, YELLOW_BOLD, mod, RESET, BOLD, RESET))
 	//l.logger.SetPrefix(fmt.Sprintf("\033[1m[\033[0m\033[33;1m%s WARN\033[0m] ", mod))
-	l.logger.SetOutput(l.file)
+	l.logger.SetOutput(l.w)
 	return l
 }
 
@@ -93,6 +96,13 @@ func (l *Logger) Writef(msg string, err error) {
 	l.logger.Output(2, fmt.Sprintf("%s: %v", msg, err))
 }
 
+func (l *Logger) Fatal(msg string) {
+	l.logger.Fatalf("%s", msg)
+}
+
+func (l *Logger) Fatalf(msg string, err error) {
+	l.logger.Fatalf("%s: %v", msg, err)
+}
 //func (l *Logger) Error(msg string, err error) {
 //	l.ErrorLogger.Printf("%s: %v", msg, err)
 //}
