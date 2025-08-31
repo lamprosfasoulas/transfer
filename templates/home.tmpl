@@ -11,7 +11,7 @@
     <body class="bg-slate-50 dark:bg-slate-900"
         x-data="{files: [
         {{ range .Files }}
-        { id: '{{ .ID }}', name: '{{ .Filename }}', sizeBytes: {{ .Size }}, expiresAt: '{{ .Expiresat }}' },
+        { id: '{{ .ID }}', name: '{{ .Filename }}', sizeBytes: {{ .Size }}, expiresAt: '{{ .ExpiresAt }}' },
         {{ end }}
         ],
         copied: '',
@@ -277,6 +277,7 @@
                                 <p x-show="uploadStatus === 'uploading'" class="text-sm text-slate-600 dark:text-slate-400">Uploading files...</p>
                                 <p x-show="uploadStatus === 'complete'" class="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Upload complete!</p>
                                 <p x-show="uploadStatus === 'error'" class="text-sm text-red-600 dark:text-red-400 font-medium">Upload failed</p>
+                                <p x-show="uploadStatus === 'error-space'" class="text-sm text-red-600 dark:text-red-400 font-medium">Upload failed - No More Space</p>
                             </div>
                         </div>
                     </div>

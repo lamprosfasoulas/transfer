@@ -60,15 +60,31 @@ window.fileManager = function() {
 
             eventSource.onopen = () => {
                 this.showSpinner = true;
-                setTimeout(() => {
-                    this.performUpload(uploadID);
-                }, 2000);
+                //setTimeout(() => {
+                //    this.performUpload(uploadID);
+                //}, 2000);
             };
 
-            eventSource.onmessage = (event) => {
+            eventSource.onmessage = async (event) => {
                 this.showSpinner = false;
-                //console.log(event.data)
+                console.log(event.data)
                 const data = JSON.parse(event.data);
+                console.log(data.message);
+
+                if (data.message === `Connected, ready for upload`) {
+                    try {
+                        await this.performUpload(uploadID);
+                    } catch (e) {
+                        if (e.message === `Error: no more space`) {
+                            this.uploadStatus = "error-space";
+                            console.error(e.message);
+                        } else {
+                            this.uploadStatus = "error";
+                            console.error("Rethrown error:", e)
+                        }
+                        eventSource.close()
+                    }
+                }
 
                 if (data.percentage !== undefined) {
                     this.uploadProgress = Math.round(data.percentage);
@@ -118,11 +134,13 @@ window.fileManager = function() {
                     body: formData
                 });
                 if (!response.ok) {
-                    throw new Error('Upload failed');
+                    const errJson = await response.json();
+                    console.log(errJson.error);
+                    // Have a look at pkg/handlers/upload.go
+                    throw new Error(`Error: ${errJson.error}`);
                 }
             } catch (e) {
-                console.error('Upload error:', e);
-                this.uploadStatus = 'error';
+                throw e;
             }
         },
 
@@ -154,7 +172,7 @@ window.fileManager = function() {
                 } catch (e) {
                     console.error(e);
                 }
-                this.files = this.files.filter(f => f.id !== this.fileToDelete.id);
+                //this.files = this.files.filter(f => f.id !== this.fileToDelete.id);
                 this.showDeleteModal = false;
                 this.fileToDelete = null;
             }
