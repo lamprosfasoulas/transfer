@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -22,7 +23,13 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-	ctx := r.Context()
+	ctx, cancel := context.WithCancel(r.Context())
+
+	defer func() {
+		io.Copy(io.Discard, r.Body)
+		r.Body.Close()
+		cancel()
+	}()
 
 	spaceUsed := GetUsedSpaceFromContext(r)
 	if r.ContentLength > (m.MAX_SPACE - spaceUsed) {
@@ -50,6 +57,12 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 		defer pw.Close()
 		defer zw.Close()
 		for {
+			select {
+			case <- ctx.Done():
+				return
+			default:
+			}
+
 			part, err := mr.NextPart()
 			if err == io.EOF {
 				break
@@ -74,11 +87,13 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
+
 			w, err := zw.Create(part.FileName())
 			if err != nil {
 				m.Logger.Error(logger.Upload).Writef("Error creating zip entry", err)
 				return
 			}
+			
 			if _, err := io.Copy(w, part); err != nil {
 				m.Logger.Error(logger.Upload).Writef("Error writing to zip", err)
 				return
@@ -101,8 +116,15 @@ func (m *MainHandlers) Upload(w http.ResponseWriter, r *http.Request) {
 
 	uploadInfo, err := m.Storage.PutObject(ctx, objectKey, prd)
 	if err != nil {
-		m.Logger.Error(logger.Upload).Writef("Failed to save to storge", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errMin := storage.ToStorageError(err)
+		switch errMin.StatusCode {
+		case 0: break
+		case 413:
+			jsonErrResponder(w, "file too big", http.StatusRequestEntityTooLarge)
+		default:
+			jsonErrResponder(w, "Internal Server Error", http.StatusInternalServerError)
+			m.Logger.Error(logger.Upload).Writef("Failed to save to storage", err)
+		}
 		return
 	}
 

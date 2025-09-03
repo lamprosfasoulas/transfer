@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -17,6 +18,37 @@ type Minio struct {
 	MinioBucket string        //Bucket name
 	MinioClient *minio.Client //Minio client
 	Error       error         //Error
+}
+
+type StorageErr struct {
+	StatusCode int
+	Message    string
+	Err        error
+}
+
+func (e StorageErr) Error() string{
+	return fmt.Sprintf("Error with StatusCode: %d::And Message: %s\n", 
+		e.StatusCode,
+		e.Message,
+		)
+}
+
+func ToStorageError(e error) StorageErr{
+	switch e := e.(type) {
+	case StorageErr:
+		return e
+	default:
+		return StorageErr{}
+	}
+}
+
+func FromMinioError(e error) StorageErr{
+	translate := minio.ToErrorResponse(e)
+	return StorageErr{
+		StatusCode: translate.StatusCode,
+		Message: translate.Message,
+		Err: e,
+	}
 }
 
 func (m *Minio) GetError() error {
@@ -61,11 +93,14 @@ func (m *Minio) PutObject(c context.Context, key string, r *ProgressReader) (*Fi
 				"filename": r.Filename,
 			},
 		})
+	if err != nil {
+		return nil, FromMinioError(err)
+	}
 	return &FileInfo{
 		Key:      uploadInfo.Key,
 		Filename: r.Filename,
 		Size:     uploadInfo.Size,
-	}, err
+	}, nil
 }
 
 func (m *Minio) GetObject(c context.Context, key string) (*FileInfo, error) {

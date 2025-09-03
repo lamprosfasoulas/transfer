@@ -47,7 +47,11 @@ window.fileManager = function() {
         cancelUpload() {
             this.resetUploadModal();
         },
-        //I need work
+
+        beforeUnload(event) {
+                event.preventDefault();
+                event.returnValue = "";
+        },
 
         continueUpload(uploadID) {
             if (this.selectedFiles.length === 0) return;
@@ -57,6 +61,10 @@ window.fileManager = function() {
 
             // Create EventSource for progress updates
             const eventSource = new EventSource(`/status?id=${uploadID}`);
+            
+            window.addEventListener("unload", (e) => {
+                eventSource.close()
+                });
 
             eventSource.onopen = () => {
                 this.showSpinner = true;
@@ -67,9 +75,9 @@ window.fileManager = function() {
 
             eventSource.onmessage = async (event) => {
                 this.showSpinner = false;
-                console.log(event.data)
+                //console.log(event.data)
                 const data = JSON.parse(event.data);
-                console.log(data.message);
+                //console.log(data.message);
 
                 if (data.message === `Connected, ready for upload`) {
                     try {
@@ -77,11 +85,12 @@ window.fileManager = function() {
                     } catch (e) {
                         if (e.message === `Error: no more space`) {
                             this.uploadStatus = "error-space";
-                            console.error(e.message);
+                        } else if (e.message === `Error: file too big`) {
+                            this.uploadStatus = "error-big";
                         } else {
                             this.uploadStatus = "error";
-                            console.error("Rethrown error:", e)
                         }
+                        console.error("Error:", e.message)
                         eventSource.close()
                     }
                 }
@@ -98,7 +107,9 @@ window.fileManager = function() {
                     setTimeout(() => {
                         this.resetUploadModal();
                         this.showSpinner = true;
-                        //// Refresh file list or add new files to the list
+
+                        window.removeEventListener("beforeunload", this.beforeUnload);
+                        // Refresh file list or add new files to the list
                         location.reload(); // Simple refresh, or implement dynamic update
                         eventSource.close();
                     }, 1500);
@@ -118,6 +129,8 @@ window.fileManager = function() {
         },
 
         async performUpload(uploadID) {
+
+            window.addEventListener("beforeunload", this.beforeUnload);
             const formData = new FormData();
 
             // Add the custom filename, the user sent
@@ -135,9 +148,10 @@ window.fileManager = function() {
                 });
                 if (!response.ok) {
                     const errJson = await response.json();
-                    console.log(errJson.error);
+                    const errMsg = errJson.error
+                    //console.log(errJson.error);
                     // Have a look at pkg/handlers/upload.go
-                    throw new Error(`Error: ${errJson.error}`);
+                    throw new Error(`Error: ${errMsg}`);
                 }
             } catch (e) {
                 throw e;

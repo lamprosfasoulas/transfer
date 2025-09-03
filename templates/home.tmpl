@@ -251,7 +251,7 @@
                                         :class="{
                                             'text-emerald-500': uploadStatus === 'uploading',
                                             'text-emerald-600': uploadStatus === 'complete',
-                                            'text-red-500': uploadStatus === 'error'
+                                            'text-red-500': uploadStatus?.startsWith('error')
                                         }"
                                         :stroke-dasharray="`${2 * Math.PI * 40}`"
                                         :stroke-dashoffset="`${2 * Math.PI * 40 - (uploadProgress / 100) * 2 * Math.PI * 40}`"
@@ -278,6 +278,7 @@
                                 <p x-show="uploadStatus === 'complete'" class="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Upload complete!</p>
                                 <p x-show="uploadStatus === 'error'" class="text-sm text-red-600 dark:text-red-400 font-medium">Upload failed</p>
                                 <p x-show="uploadStatus === 'error-space'" class="text-sm text-red-600 dark:text-red-400 font-medium">Upload failed - No More Space</p>
+                                <p x-show="uploadStatus === 'error-big'" class="text-sm text-red-600 dark:text-red-400 font-medium">Upload failed - File too Big</p>
                             </div>
                         </div>
                     </div>

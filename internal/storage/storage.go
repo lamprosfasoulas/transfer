@@ -56,6 +56,9 @@ type ProgressReader struct {
 	Filename string
 	UploadID string
 	Dispatch sse.Dispatcher
+
+	lastPct	int
+	lastTime time.Time
 }
 
 // NewProgressReader creates a new progress reader for each upload
@@ -66,7 +69,20 @@ func NewProgressReader(src io.Reader, total int64, file, upId string, d sse.Disp
 		Filename: file,
 		UploadID: upId,
 		Dispatch: d,
+
+		lastTime: time.Now(),
 	}
+}
+
+func (pr *ProgressReader) sendEvent() {
+			e := sse.NewProgressEvent(
+				pr.Filename,
+				"Uploading",
+				pr.Red,
+				pr.Total,
+				pr.lastPct,
+			)
+	pr.Dispatch.SendEvent(context.Background(), pr.UploadID, e)
 }
 
 // Read is a wrapper of io.Reader Read() method.
@@ -79,14 +95,19 @@ func (pr *ProgressReader) Read(p []byte) (n int, err error) {
 		if pr.Total > 0 {
 			pct = int((float64(pr.Red) / float64(pr.Total)) * 100)
 		}
-		ev := sse.NewProgressEvent(
-			pr.Filename,
-			"Uploading",
-			pr.Red,
-			pr.Total,
-			pct,
-		)
-		pr.Dispatch.SendEvent(context.Background(), pr.UploadID, ev)
+		switch {
+		case pct > pr.lastPct:
+			//fmt.Printf("\033[33;1mSend message: %+v\033[0m\n", pct)
+			pr.lastPct = pct
+			pr.sendEvent()
+		case time.Since(pr.lastTime) > 500 * time.Millisecond:
+			//fmt.Printf("\033[33;1mSend message: %+v\033[0m\n", time.Since(pr.lastTime))
+			pr.lastTime = time.Now()
+			pr.sendEvent()
+		case pct == 100:
+			pr.sendEvent()
+		default:
+		}
 	}
 	return n, err
 }

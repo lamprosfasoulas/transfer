@@ -93,7 +93,7 @@ func (l *Logger) Write(msg string) {
 	l.logger.Output(2, fmt.Sprintf("%s", msg))
 }
 
-func (l *Logger) Writef(msg string, err error) {
+func (l *Logger) Writef(msg string, err any) {
 	l.logger.Output(2, fmt.Sprintf("%s: %v", msg, err))
 }
 
