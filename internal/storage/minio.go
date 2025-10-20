@@ -159,6 +159,7 @@ func (m *Minio) ListFiles(c context.Context, u string) ([]FileInfo, int64, error
 			file.ID = key[1]
 		}
 
+		file.Key = obj.Key
 		file.Content = obj.ContentType
 		file.Size = obj.Size
 		file.ExpiresAt = obj.LastModified.Add(7 * 24 * time.Hour)

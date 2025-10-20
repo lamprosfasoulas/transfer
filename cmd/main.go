@@ -61,7 +61,7 @@ func janitor() {
 			if expired {
 				logProvider.Warn(logger.Janitor).Write(fmt.Sprintf("File %s is expired and is being deleted!\n", file.ID))
 
-				_, err := storageProvider.DeleteObject(ctx, file.ID)
+				_, err := storageProvider.DeleteObject(ctx, file.Key)
 				if err != nil {
 					logProvider.Error(logger.Janitor).Write(fmt.Sprintf("File %s could not be deleted: %v!\n", file.ID, err))
 					continue
